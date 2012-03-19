@@ -6,23 +6,16 @@
 var express = require('express')
   , routes = require('./routes')
 	, mongoose = require('mongoose')
+	, mongoStore = require('connect-mongodb')
 	, models = require('./models.js')
 	, db
-	, Document;
+	, Document
+  , User;
 
 
 var app = module.exports = express.createServer();
 
 // Configuration
-
-app.configure(function(){
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  app.use(express.bodyParser());
-  app.use(express.methodOverride());
-  app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
-});
 
 app.configure('test', function(){
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
@@ -39,25 +32,48 @@ app.configure('production', function(){
 	app.set('db-uri', 'mongodb://localhost/nodepad-production');
 });
 
-models.defineModels(mongoose, function(){
-	app.Document = Document = mongoose.model('Document');
-	db = mongoose.connect(app.set('db-uri'));
-
-	routes.document.initialize(Document);
+app.configure(function(){
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.bodyParser());
+	app.use(express.cookieParser());
+	app.use(express.session({ 
+		store: mongoStore(app.set('db-uri')),
+		secret: 'topsecret' 
+	}));
+  app.use(express.methodOverride());
+  app.use(app.router);
+  app.use(express.static(__dirname + '/public'));
 });
 
-// Routes
+models.defineModels(mongoose, function(){
+	app.Document = Document = mongoose.model('Document');
+	app.User = User = mongoose.model('User');
+	db = mongoose.connect(app.set('db-uri'));
+
+	routes.documents.initialize(Document);
+	routes.sessions.initialize(User);
+	routes.users.initialize(User);
+});
+
+// Route
 
 app.get('/', routes.index);
 
-app.get('/documents.:format?', routes.document.list);
-app.post('/documents.:format?', routes.document.create);
-app.get('/documents/:id.:format?/edit', routes.document.edit);
-app.get('/documents/new', routes.document.new);
-app.del('/documents/:id.:format?', routes.document.delete);
-app.get('/documents/:id.:format?', routes.document.read);
-app.put('/documents/:id.:format?', routes.document.update);
+app.get('/documents.:format?', routes.sessions.loadUser, routes.documents.list);
+app.post('/documents.:format?', routes.documents.create);
+app.get('/documents/:id.:format?/edit', routes.documents.edit);
+app.get('/documents/new', routes.documents.new);
+app.del('/documents/:id.:format?', routes.documents.delete);
+app.get('/documents/:id.:format?', routes.documents.read);
+app.put('/documents/:id.:format?', routes.documents.update);
 
+app.get('/sessions/new', routes.sessions.new);
+app.post('/sessions', routes.sessions.show);
+app.del('/sessions', routes.sessions.loadUser, routes.sessions.delete);
+
+app.get('/users/new', routes.users.new);
+app.post('/users.:format?', routes.users.save);
 
 if(!module.parent){
 	app.listen(3000);
