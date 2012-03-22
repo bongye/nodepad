@@ -3,6 +3,18 @@ html
 	head
 		title= 'Nodepad'
 		link(rel='stylesheet', href='/stylesheets/style.css')
+		link(rel='stylesheet', href='/stylesheets/aristo.css')
 		script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
-	body!= body
+		script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js')
+	body
+		div(id='container')
+			div(id='header')
+				ul
+					li	
+						h1
+							a(href='/') Nodepad
+						- if (typeof currentUser !== 'undefined')
+							li(class='right')
+								a(href='/sessions', class='destroy') Log out
+			!= body
 		script(type='text/javascript', src='/javascripts/application.js')

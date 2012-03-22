@@ -5,7 +5,7 @@ exports.initialize = function(aDocument){
 };
 
 // Document list
-exports.list = function(req, res){
+exports.index = function(req, res){
 	Document.find({}, function(err, documents){
 		switch(req.params.format){
 			case 'json':
@@ -37,8 +37,8 @@ exports.create = function(req, res){
 	});
 };
 
-// Read document
-exports.read = function(req, res){
+// Show document
+exports.show = function(req, res){
 	Document.findById(req.params.id, function(err, d){
 		switch(req.params.format){
 			case 'json':

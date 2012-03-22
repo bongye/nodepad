@@ -60,20 +60,20 @@ models.defineModels(mongoose, function(){
 
 app.get('/', routes.index);
 
-app.get('/documents.:format?', routes.sessions.loadUser, routes.documents.list);
+app.get('/documents.:format?', routes.sessions.loadUser, routes.documents.index);
 app.post('/documents.:format?', routes.documents.create);
 app.get('/documents/:id.:format?/edit', routes.documents.edit);
 app.get('/documents/new', routes.documents.new);
 app.del('/documents/:id.:format?', routes.documents.delete);
-app.get('/documents/:id.:format?', routes.documents.read);
+app.get('/documents/:id.:format?', routes.documents.show);
 app.put('/documents/:id.:format?', routes.documents.update);
 
 app.get('/sessions/new', routes.sessions.new);
-app.post('/sessions', routes.sessions.show);
+app.post('/sessions', routes.sessions.create);
 app.del('/sessions', routes.sessions.loadUser, routes.sessions.delete);
 
 app.get('/users/new', routes.users.new);
-app.post('/users.:format?', routes.users.save);
+app.post('/users.:format?', routes.users.create);
 
 if(!module.parent){
 	app.listen(3000);

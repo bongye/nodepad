@@ -27,8 +27,18 @@ exports.new = function(req, res){
 	});
 };
 
-exports.show = function(req, res){
-	// Find the user and set the current User session variable
+exports.create = function(req, res){
+	User.findOne({ 
+		email: req.body.user.email
+	}, function(err, user){
+		if(user && user.authenticate(req.body.user.password)){
+			req.session.user_id = user.id;
+			res.redirect('/documents');
+		} else {
+			// Show Error
+			res.redirect('/sessions/new');
+		}
+	});
 };
 
 exports.delete = function(req, res){

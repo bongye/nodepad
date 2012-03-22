@@ -12,7 +12,7 @@ exports.new = function(req, res){
 		});
 };
 
-exports.save = function(req, res){
+exports.create = function(req, res){
 	var user = new User(req.body.user);
 
 	function userSaveFailed(){
