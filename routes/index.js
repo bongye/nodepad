@@ -1,12 +1,10 @@
+var fs = require('fs');
 
-/*
- * GET home page.
- */
-
-exports.index = function(req, res){
-  res.render('index', { title: 'Express' })
+module.exports = function(app){
+	fs.readdirSync(__dirname).forEach(function(file){
+		if (file.indexOf('.swp') > 0) return;
+		if (file == 'index.js') return;
+		var name = file.substr(0, file.indexOf('.'));
+		require('./' + name)(app);
+	});
 };
-
-exports.documents = require('./documents.js');
-exports.sessions = require('./sessions.js');
-exports.users = require('./users.js');

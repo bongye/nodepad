@@ -4,10 +4,10 @@
  */
 
 var express = require('express')
-  , routes = require('./routes')
 	, mongoose = require('mongoose')
 	, mongoStore = require('connect-mongodb')
 	, models = require('./models.js')
+	, util = require('util')
 	, db
 	, Document
   , User;
@@ -50,30 +50,56 @@ models.defineModels(mongoose, function(){
 	app.Document = Document = mongoose.model('Document');
 	app.User = User = mongoose.model('User');
 	db = mongoose.connect(app.set('db-uri'));
+});
 
-	routes.documents.initialize(Document);
-	routes.sessions.initialize(User);
-	routes.users.initialize(User);
+// Error Handling
+app.NotFound = NotFound = function(msg){
+	this.name = 'NotFound';
+	Error.call(this, msg);
+	Error.captureStackTrace(this, arguments.callee);
+};
+
+util.inherits(NotFound, Error);
+
+app.get('/404', function(req, res){
+	throw new NotFound;
+});
+
+app.get('/500', function(req, res){
+	throw new Error('An expected error');
+});
+
+app.error(function(err, req, res, next){
+	if(err instanceof NotFound){
+		res.render('404.jade', {
+			status:404
+		});
+	} else {
+		next(err);
+	}
 });
 
 // Route
+app.loadUser = loadUser  = function(req, res, next){
+	if(req.session.user_id){
+		User.findById(req.session.user_id, function(err, user){
+			if(user){
+				req.currentUser = user;
+				next();
+			} else {
+				res.redirect('/sessions/new');
+			}
+		});
+	} else {
+		res.redirect('/sessions/new');
+	}
+};
 
-app.get('/', routes.index);
+app.get('/', loadUser,  function(req,res){
+	res.redirect('/documents');
+});
 
-app.get('/documents.:format?', routes.sessions.loadUser, routes.documents.index);
-app.post('/documents.:format?', routes.documents.create);
-app.get('/documents/:id.:format?/edit', routes.documents.edit);
-app.get('/documents/new', routes.documents.new);
-app.del('/documents/:id.:format?', routes.documents.delete);
-app.get('/documents/:id.:format?', routes.documents.show);
-app.put('/documents/:id.:format?', routes.documents.update);
-
-app.get('/sessions/new', routes.sessions.new);
-app.post('/sessions', routes.sessions.create);
-app.del('/sessions', routes.sessions.loadUser, routes.sessions.delete);
-
-app.get('/users/new', routes.users.new);
-app.post('/users.:format?', routes.users.create);
+require('./routes')(app);
 
 if(!module.parent){
 	app.listen(3000);
