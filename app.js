@@ -52,6 +52,10 @@ models.defineModels(mongoose, function(){
 	db = mongoose.connect(app.set('db-uri'));
 });
 
+// Helper
+app.helpers(require('./helpers.js').helpers);
+app.dynamicHelpers(require('./helpers.js').dynamicHelpers);
+
 // Error Handling
 app.NotFound = NotFound = function(msg){
 	this.name = 'NotFound';

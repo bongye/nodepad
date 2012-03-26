@@ -12,9 +12,10 @@ html
 				ul
 					li	
 						h1
-							a(href='/') Nodepad
+							a(href='/') #{nameAndVersion(appName, version)}
 						- if(typeof currentUser !== 'undefined')
 							li(class='right')
 								a(href='/sessions', class='destroy') Log out
+			!{flashMessages}					
 			!= body
 		script(type='text/javascript', src='/javascripts/application.js')

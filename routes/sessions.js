@@ -18,6 +18,7 @@ module.exports = function(app){
 				res.redirect('/documents');
 			} else {
 				// Show Error
+				req.flash('error', 'Incorrect credentials');
 				res.redirect('/sessions/new');
 			}
 		});

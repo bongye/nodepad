@@ -1,6 +1,7 @@
 module.exports = function(app){
 	var Document = app.Document;
 	var NotFound = app.NotFound;
+
 	// Document list
 	app.get('/documents.:format?', app.loadUser, function(req, res){
 		Document.find({}, function(err, documents){
@@ -31,8 +32,31 @@ module.exports = function(app){
 					res.send(d.toObject());
 				break;
 				default:
+					req.flash('info', 'Document created');
 					res.redirect('/documents');
 				break;
+			}
+		});
+	});
+
+	// Edit document
+	app.get('/documents/:id.:format?/edit', app.loadUser, function(req, res){
+		Document.findById(req.params.id, function(err, d){
+			res.render('documents/edit.jade', {
+				locals: {
+					d: d,
+					currentUser: req.currentUser
+				}
+			});
+		});
+	});
+
+	// New Document
+	app.get('/documents/new', app.loadUser, function(req, res){
+		res.render('documents/new.jade', {
+			locals: {
+				d: new Document(),
+				currentUser: req.currentUser
 			}
 		});
 	});
@@ -92,25 +116,4 @@ module.exports = function(app){
 		});
 	});
 
-	// Edit document
-	app.get('/documents/:id.:format?/edit', app.loadUser, function(req, res){
-		Document.findById(req.params.id, function(err, d){
-			res.render('documents/edit.jade', {
-				locals: {
-					d: d,
-					currentUser: req.currentUser
-				}
-			});
-		});
-	});
-
-	// New Document
-	app.get('/documents/new', app.loadUser, function(req, res){
-		res.render('documents/new.jade', {
-			locals: {
-				d: new Document(),
-				currentUser: req.currentUser
-			}
-		});
-	});
 };
