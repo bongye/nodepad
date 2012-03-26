@@ -8,21 +8,30 @@
 		}
 	};
 
+	$.fn.itemTitle = function(){
+		try {
+			var title = $(this).text();
+			return title;
+		} catch (exception) {
+			return null;
+		}
+	};
+
 	$.put = function(url, data, success){
 		data._method = 'PUT';
 		$.post(url, data, success, 'json');
 	};
 
-	$('.destroy').on('click', function(e){
+	$('#delete-document').on('click', function(e){
 		e.preventDefault();
-		if(confirm('Are you sure?')){
+		if(confirm('Are you sure you want to delete that document?')){
 			var element = $(this),
 					form = $('<form></form>');
 
 			form
 			.attr({
 				method: 'POST',
-				action: element.attr('href')
+				action: '/documents/' + $('#document-list .selected').itemID()
 			})
 			.hide()
 			.append('<input type="hidden" />')
@@ -30,6 +39,29 @@
 			.attr({
 				'name': '_method',
 				'value': 'delete'
+			})
+			.end()
+			.submit();
+		}
+	});
+
+	$('#logout').on('click', function(e){
+		e.preventDefault();
+		if(confirm('Really wanna logout?')){
+			var element = $(this);
+			var form = $('<form></form>');
+
+			form
+			.attr({
+				method:'POST',
+				action: element.attr('href')
+			})
+			.hide()
+			.append('<input type="hidden" />')
+			.find('input')
+			.attr({
+				name: '_method',
+				value: 'delete'
 			})
 			.end()
 			.submit();
@@ -77,7 +109,7 @@
 		});
 	}
 
-	$('#document-list li a').live('click', function(e){
+	$('#document-list li a').on('click', function(e){
 		var li = $(this);
 
 		$.get(this.href + '.json', function(data){
@@ -95,15 +127,32 @@
 	}
 
 	$('#save-button').click(function(){
-		var id = $('#document-list .selected').itemID(),
-		    params = {
+		var id = $('#document-list .selected').itemID();
+		var title = $('#document-list .selected').itemTitle();
+		var params = {
 					d: {
 						data: $('#editor').val(),
-						id: id
+						id: id,
+						title: title
 					}
 				};
 		$.put('/documents/' + id + '.json', params, function(data){
 		});
+	});
+
+	$('#html-button').click(function(){
+		var container = $('#html-container');
+		if(container.is(':visible')){
+			container.html('').hide();
+			$('#html-button').removeClass('active');
+		} else {
+			$('#save-button').trigger('click');
+			$('#html-button').addClass('active');
+			var id = $('#document-list .selected').itemID();
+			$.get('/documents/' + id + '.html', function(data){
+				container.html(data).show();
+			});
+		}
 	});
 
 	$(window).resize(resize);

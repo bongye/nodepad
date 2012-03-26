@@ -1,6 +1,7 @@
 module.exports = function(app){
 	var Document = app.Document;
 	var NotFound = app.NotFound;
+	var markdown = app.markdown;
 
 	// Document list
 	app.get('/documents.:format?', app.loadUser, function(req, res){
@@ -71,6 +72,9 @@ module.exports = function(app){
 			switch(req.params.format){
 				case 'json':
 					res.send(d.toObject());
+				break;
+				case 'html':
+					res.send(markdown.toHTML(d.data));
 				break;
 				default:
 					res.render('documents/show.jade', {

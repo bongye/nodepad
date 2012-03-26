@@ -7,6 +7,7 @@ var express = require('express')
 	, mongoose = require('mongoose')
 	, mongoStore = require('connect-mongodb')
 	, models = require('./models.js')
+	, markdown = require('markdown').markdown
 	, util = require('util')
 	, db
 	, Document
@@ -65,6 +66,10 @@ app.NotFound = NotFound = function(msg){
 };
 
 util.inherits(NotFound, Error);
+
+
+// Library Loading
+app.markdown = markdown;
 
 app.get('/404', function(req, res){
 	throw new NotFound;

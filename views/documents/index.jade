@@ -7,17 +7,20 @@
 						=documents[d].title
 	ul.toolbar
 		li
-			a(href='/documents/new')
+			a#create-document(href='/documents/new')
 				+
 		li
-			a(href='#', id='delete-document')
+			a#delete-document(href='#')
 				-
 .content-divider
 .content
+	#html-container(style='display: none')
 	#editor-container
 		textarea(name='d[data]', id='editor')
 			=d && d.data ? d.data : ''
 	ul#controls.toolbar
 		li
 			a#save-button(href='#') Save
+		li
+			a#html-button(href='#') HTML
 .clear

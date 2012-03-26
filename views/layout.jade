@@ -15,7 +15,7 @@ html
 							a(href='/') #{nameAndVersion(appName, version)}
 						- if(typeof currentUser !== 'undefined')
 							li(class='right')
-								a(href='/sessions', class='destroy') Log out
+								a#logout(href='/sessions') Log out
 			!{flashMessages}					
 			!= body
 		script(type='text/javascript', src='/javascripts/application.js')
