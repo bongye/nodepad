@@ -49,6 +49,7 @@ app.configure(function(){
 models.defineModels(mongoose, function(){
 	app.Document = Document = mongoose.model('Document');
 	app.User = User = mongoose.model('User');
+	app.LoginToken = LoginToken = mongoose.model('LoginToken');
 	db = mongoose.connect(app.set('db-uri'));
 });
 
@@ -83,6 +84,41 @@ app.error(function(err, req, res, next){
 	}
 });
 
+function authenticateFromLoginToken(req, res, next){
+	var cookie = JSON.parse(req.cookies.logintoken);
+	
+	LoginToken.findOne({
+		email: cookie.email,
+		series: cookie.series,
+		token: cookie.token
+	}, function(err, token){
+		if(!token){
+			res.redirect('/sessions/new');
+			return;
+		}
+
+		User.findOne({
+			email: token.email
+		}, function(err, user){
+			if(user){
+				req.session.user_id = user.id;
+				req.currentUser = user;
+
+				token.token = token.randomToken();
+				token.save(function(){
+					res.cookie('logintoken', token.cookieValue, {
+						expires: new Date(Date.now() + 2 * 604800000),
+						path: '/'
+					});
+					next();
+				});
+			} else {
+				res.redirect('/sessions/new');
+			}
+		});
+	});
+}
+
 // Route
 app.loadUser = loadUser  = function(req, res, next){
 	if(req.session.user_id){
@@ -94,6 +130,8 @@ app.loadUser = loadUser  = function(req, res, next){
 				res.redirect('/sessions/new');
 			}
 		});
+	} else if(req.cookies.logintoken) {
+		authenticateFromLoginToken(req, res, next);
 	} else {
 		res.redirect('/sessions/new');
 	}
