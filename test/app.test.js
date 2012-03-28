@@ -1,77 +1,38 @@
-var app = require('../app')
-  , lastID = '';
+var app = require('../app'),
+    assert = require('assert'),
+    zombie = require('zombie'),
+		testHelper = require('./helper')
 
-module.exports = {
-	'POST /documents.json': function(beforeExit, assert){
-		assert.response(app, {
-			url: '/documents.json',
-			method: 'POST',
-			data: JSON.stringify({ 
-				document: {
-					title: 'Test' 
-				} 
-			}),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		}, {
-			status: 200,
-			headers: {
-				'Content-Type': 'application/json; charset=utf-8'
-			}
-		}, function(res){
-			var document = JSON.parse(res.body);
-			assert.eql('Test', document.title);
-			lastID = document._id;
-		});
-	},
+describe('Sign in', function(){
+	before(function(done){
+		app.listen(3000);
 
-	'HTML POST /documents': function(beforeExit, assert){
-		assert.response(app, {
-			url: '/documents',
-			method: 'POST',
-			data: 'document[title]=test',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
-			}
-		}, {
-			status: 302,
-			headers: {
-				'Content-Type': 'text/html'
-			}
-		}, function(){
-		});
-	},
-
-	'GET /documents.json' : function(beforeExit, assert){
-		assert.response(app, {
-			url: '/documents.json'
-		}, {
-			status: 200,
-			headers: {
-				'Content-Type': 'application/json; charset=utf-8'
-			}
-		}, function(res){
-			var documents = JSON.parse(res.body);
-			assert.type(documents, 'object');
-			documents.forEach(function(d){
-				app.Document.findById(d._id, function(document){
-					if(document) document.remove();
-				});
+		testHelper.clear([app.User], function(){
+			var user = new app.User({
+				email: 'alex@example.com',
+				password: 'test'
 			});
+			user.save(done);
+			console.log('done');
 		});
-	},
+	});
 
-	'GET /': function(beforeExit, assert){
-		assert.response(app, {
-			url: '/'
-		}, {
-			status: 200,
-			headers: {
-				'Content-Type': 'text/html; charset=utf-8'
-			}
-		}, function(res){
-			assert.includes(res.body, '<title>Express</title>');
+	after(function(done){
+		app.close();
+		done();
+	});
+
+	it('should allow valid users to sign in', function(done){
+		var browser = new zombie();
+		browser.visit('http://localhost:3000/sessions/new', function(){
+			console.log('got page');
+			browser.
+				fill('user[email]', 'alex@example.com').
+				fill('user[password]', 'test').
+				pressButton('Log In', function(){
+					assert.equal(browser.text('#header a.logout'), 'Log out');
+				});
 		});
-	}
-};
+		done();
+	});
+});
