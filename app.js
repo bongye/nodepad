@@ -6,12 +6,12 @@
 var express = require('express')
 	, mongoose = require('mongoose')
 	, mongoStore = require('connect-mongodb')
-	, models = require('./models.js')
 	, markdown = require('markdown').markdown
 	, util = require('util')
 	, db
 	, Document
-  , User;
+  , User
+	, LoginToken;
 
 
 var app = module.exports = express.createServer();
@@ -47,7 +47,10 @@ app.configure(function(){
   app.use(express.static(__dirname + '/public'));
 });
 
-models.defineModels(mongoose, function(){
+
+// Models
+app.mongoose = mongoose;
+require('./models')(app, function(){
 	app.Document = Document = mongoose.model('Document');
 	app.User = User = mongoose.model('User');
 	app.LoginToken = LoginToken = mongoose.model('LoginToken');
@@ -148,6 +151,8 @@ app.get('/', loadUser,  function(req,res){
 
 require('./routes')(app);
 
+
+// Start
 if(!module.parent){
 	app.listen(3000);
 	console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
