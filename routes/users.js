@@ -1,5 +1,7 @@
 module.exports = function(app){
 	var User = app.User;
+	var emails = app.emails;
+
 	app.get('/users/new', function(req, res){
 		res.render('users/new.jade', {
 				locals: {
@@ -22,6 +24,8 @@ module.exports = function(app){
 			if(err) return userSaveFailed();
 
 			req.flash('info', 'Your account has been created');
+			emails.sendWelcome(user);
+
 			switch(req.params.format){
 				case 'json':
 					res.send(user.toObject());

@@ -45,6 +45,12 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
+	app.set('mailOptions', {
+		host: 'localhost',
+		port: '25',
+		from: 'nodepad@example.com',
+		domain: 'localhost'
+	});
 });
 
 
@@ -56,6 +62,9 @@ require('./models')(app, function(){
 	app.LoginToken = LoginToken = mongoose.model('LoginToken');
 	db = mongoose.connect(app.set('db-uri'));
 });
+
+// Mailer
+app.emails = require('./emails.js')(app);
 
 // Helper
 app.helpers(require('./helpers.js').helpers);
