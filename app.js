@@ -46,10 +46,13 @@ app.configure(function(){
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 	app.set('mailOptions', {
-		host: 'localhost',
-		port: '25',
-		from: 'nodepad@example.com',
-		domain: 'localhost'
+		host: 'smtp.gmail.com',
+		port: '587',
+		from: 'bongye@wafflestudio.com',
+		domain: 'localhost',
+		authentication: "login",
+		username: "bongye@wafflestudio.com",
+		password: "###" // it's my mail password ...
 	});
 });
 
