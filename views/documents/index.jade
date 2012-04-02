@@ -16,6 +16,8 @@
 .content
 	#html-container(style='display: none')
 	#editor-container
+		div.title
+			input.title(name='d[title]')= d.title
 		textarea(name='d[data]', id='editor')
 			=d && d.data ? d.data : ''
 	ul#controls.toolbar

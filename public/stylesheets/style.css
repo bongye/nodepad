@@ -133,8 +133,8 @@ ul.toolbar a {
   line-height: 16px;
 }
 ul.toolbar a:active {
-  background-color: #9c9c9c;
-  border-color: #9c9c9c;
+  background-color: dark-gray;
+  color: white;
 }
 ul.toolbar a {
   text-shadow: #fff 0 1px 0;
@@ -143,10 +143,21 @@ ul.toolbar a {
 #editor-container {
   width: 100%;
 }
-#editor {
+#editor,
+#editor-container input.title {
   border: none;
   outline: none;
   font-size: 100%;
+  border-bottom: 1px solid gray;
+  margin: 0;
+  padding: 5px 0;
+  width: 100%;
+  padding: 5px 0;
+}
+#editor-container input.title {
+  float: left;
+  padding-left: 4px;
+  margin-left: 1px;
 }
 #controls {
   height: 30px;
@@ -182,4 +193,26 @@ ul.toolbar a {
   -moz-box-shadow: 0 0 8px #111;
   -webkit-box-shadow: 0 0 8px #111;
   box-shadow: 0 0 8px #111;
+}
+form.users {
+  background-color: faded-white;
+  border: 1px solid medium-gray;
+  float: left;
+  padding: 0 10px 10px 10px;
+}
+form.users div {
+  padding: 10px 0 0 0;
+  float: left;
+  clear: left;
+}
+form.users label {
+  width: 140px;
+  float: left;
+  clear: right;
+  color: dark-gray;
+  font-weight: bold;
+}
+form.users input[type=submit] {
+  margin-left: 140px;
+  clear: both;
 }

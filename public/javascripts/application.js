@@ -8,19 +8,25 @@
 		}
 	};
 
-	$.fn.itemTitle = function(){
-		try {
-			var title = $(this).text();
-			return title;
-		} catch (exception) {
-			return null;
-		}
-	};
-
 	$.put = function(url, data, success){
 		data._method = 'PUT';
 		$.post(url, data, success, 'json');
 	};
+
+
+	$('#create-document').on('click', function(e){
+		e.preventDefault();
+		$.post('/documents.json', {
+			d: {
+				data: '',
+				title: 'Untitled Document'
+			}
+		}, function(new_doc){
+			$('#document-list').append("<li><a id='document-title-" + new_doc._id + "' href='/documents/" + new_doc._id + "'>" + new_doc.title + "</a></li>");
+			$('#document-title-' + new_doc._id).trigger('click');
+			e.preventDefault();
+		});
+	});
 
 	$('#delete-document').on('click', function(e){
 		e.preventDefault();
@@ -77,6 +83,8 @@
 				divider = $('.content-divider'),
 				content = $('.content'),
 				controls = $('#controls');
+				edc = $('#editor-container');
+				hc = $('#html-container');
 		
 		$('#DocumentTitles').css({
 			height: height - toolbar.height() - 1 + 'px'
@@ -99,10 +107,15 @@
 			height: height + 'px'
 		});
 
+		edc.css({
+			height: height - hc.height() - controls.outerHeight() + 'px'
+		});
+
 		ed.css({
-			width: content.width() - 4 + 'px',
-			height: height - controls.height() - 5 + 'px'
+			width: content.width() + 'px',
+			height: edc.height() - controls.outerHeight() - 6 + 'px'
 		}).focus();
+
 
 		$('#controls').css({
 			width: content.width() + 'px'
@@ -116,6 +129,7 @@
 			$('#document-list .selected').removeClass('selected');
 			li.addClass('selected');
 			$('#editor').val(data.data);
+			$('.title').val(data.title);
 			$('#editor').focus();
 		});
 
@@ -126,17 +140,18 @@
 		$('#document-list li a').first().trigger('click');
 	}
 
+
 	$('#save-button').click(function(){
 		var id = $('#document-list .selected').itemID();
-		var title = $('#document-list .selected').itemTitle();
 		var params = {
 					d: {
 						data: $('#editor').val(),
 						id: id,
-						title: title
+						title: $('input.title').val()
 					}
 				};
 		$.put('/documents/' + id + '.json', params, function(data){
+			$('#document-title-' + id).html(data.title);
 		});
 	});
 
@@ -145,12 +160,14 @@
 		if(container.is(':visible')){
 			container.html('').hide();
 			$('#html-button').removeClass('active');
+			resize();
 		} else {
 			$('#save-button').trigger('click');
 			$('#html-button').addClass('active');
 			var id = $('#document-list .selected').itemID();
 			$.get('/documents/' + id + '.html', function(data){
 				container.html(data).show();
+				resize();
 			});
 		}
 	});

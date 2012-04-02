@@ -7,6 +7,7 @@ var express = require('express')
 	, mongoose = require('mongoose')
 	, mongoStore = require('connect-mongodb')
 	, markdown = require('markdown').markdown
+	, less = require('less')
 	, util = require('util')
 	, db
 	, Document
@@ -43,8 +44,17 @@ app.configure(function(){
 		secret: 'topsecret' 
 	}));
   app.use(express.methodOverride());
-  app.use(app.router);
+	app.use(express.compiler({
+		src: __dirname + '/public',
+		enable:['less']
+	}));
   app.use(express.static(__dirname + '/public'));
+  app.use(app.router);
+	app.use(express.errorHandler({
+		dumpExceptions: true,
+		showStack: true
+	}));
+
 	app.set('mailOptions', {
 		host: 'smtp.gmail.com',
 		port: '587',
