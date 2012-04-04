@@ -154,6 +154,9 @@ ul.toolbar a {
   width: 100%;
   padding: 5px 0;
 }
+#editor {
+  resize: none;
+}
 #editor-container input.title {
   float: left;
   padding-left: 4px;
@@ -215,4 +218,11 @@ form.users label {
 form.users input[type=submit] {
   margin-left: 140px;
   clear: both;
+}
+form.search {
+  margin-left: 140px;
+  clear: both;
+}
+#show-all {
+  color: medium-gray;
 }

@@ -7,9 +7,9 @@ module.exports = function(app){
 	app.get('/documents.:format?', app.loadUser, function(req, res){
 		Document.find({
 				user_id: req.currentUser.id
-			}, [], {
+		}, [], {
 				sort: ['title', 'descending']
-			}, function(err, documents){
+		}, function(err, documents){
 			switch(req.params.format){
 				case 'json':
 					res.send(documents.map(function(d){
@@ -17,6 +17,12 @@ module.exports = function(app){
 					}));
 				break;
 				default:
+					documents = documents.map(function(d){
+						return {
+							title: d.title,
+							id: d._id
+						};
+					});
 					res.render('documents/index.jade', {
 						locals: {
 							documents: documents,
@@ -36,9 +42,30 @@ module.exports = function(app){
 		}, function(err, documents){
 			res.send(documents.map(function(d){
 				return {
-					title: d.title, id: d.id
+					title: d.title, 
+					id: d._id
 				};
 			}));
+		});
+	});
+
+	app.post('/search.:format?', app.loadUser, function(req, res){
+		Document.find({
+			user_id: req.currentUser.id,
+			keywords: req.body.s ? req.body.s : null
+		}, [], {
+			sort: ['title', 'descending']
+		}, function(err, documents){
+			switch(req.params.format){
+				case 'json':
+					res.send(documents.map(function(d){
+						return {
+							title: d.title,
+							_id: d._id
+						}
+					}));
+				break;
+			}
 		});
 	});
 
@@ -69,12 +96,14 @@ module.exports = function(app){
 
 	// Create document
 	app.post('/documents.:format?', app.loadUser, function(req, res){
-		var d = new Document(req.body['d']);
+		var d = new Document(req.body);
 		d.user_id = req.currentUser.id;
 		d.save(function(){
 			switch(req.params.format){
 				case 'json':
-					res.send(d.toObject());
+					var data = d.toObject();
+					data.id = data._id;
+					res.send(data);
 				break;
 				default:
 					req.flash('info', 'Document created');
@@ -114,13 +143,14 @@ module.exports = function(app){
 	});
 
 	// Update document
-	app.put('/documents/:id.:format?', app.loadUser, function(req, res){
+	app.put('/documents/:id.:format?', app.loadUser, function(req, res, next){
 		Document.findOne({
 			_id: req.params.id,
 			user_id: req.currentUser.id
 		}, function(err, d){
-			d.title = req.body.d.title;
-			d.data = req.body.d.data;
+			if(!d) return next(new NotFound('Document not found'));
+			d.title = req.body.title;
+			d.data = req.body.data;
 
 			d.save(function(){
 				switch(req.params.format){
@@ -128,6 +158,7 @@ module.exports = function(app){
 						res.send(d.toObject());
 					break;
 					default:
+						req.flash('info', 'Document updated');
 						res.redirect('/documents');
 				}
 			});
@@ -135,11 +166,12 @@ module.exports = function(app){
 	});
 
 	// Delete document
-	app.del('/documents/:id.:format?', app.loadUser, function(req, res){
+	app.del('/documents/:id.:format?', app.loadUser, function(req, res, next){
 		Document.findOne({
 			_id: req.params.id,
 			user_id: req.currentUser.id
 		}, function(err, d){
+			if(!d) return next(new NotFound('Document not found'));
 			d.remove(function(){
 				switch(req.params.format){
 					case 'json':
