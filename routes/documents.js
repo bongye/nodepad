@@ -64,6 +64,9 @@ module.exports = function(app){
 							_id: d._id
 						}
 					}));
+				default:
+					res.send('Format not available', 406);
+					break;
 				break;
 			}
 		});

@@ -9,6 +9,7 @@ var express = require('express')
 	, markdown = require('markdown').markdown
 	, less = require('less')
 	, util = require('util')
+	, connectTimeout = require('connect-timeout')
 	, db
 	, Document
   , User
@@ -54,7 +55,10 @@ app.configure(function(){
 		dumpExceptions: true,
 		showStack: true
 	}));
-
+	
+	app.use(connectTimeout({
+		time: 10000
+	}));
 	app.set('mailOptions', {
 		host: 'smtp.gmail.com',
 		port: '587',
