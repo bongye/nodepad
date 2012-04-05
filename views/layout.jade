@@ -1,4 +1,4 @@
-!!!
+!!! 5
 html
 	head
 		title= 'Nodepad'
@@ -12,16 +12,15 @@ html
 	body
 		#container
 			#header
-				ul
-					li	
-						h1
-							a(href='/') #{nameAndVersion(appName, version)}
-						- if(typeof currentUser !== 'undefined')
-							li.right
-								a#logout(href='/sessions') Log out
-							li.right
-								form.search(action='/search')
-									input(name='s', value='Search')
+				h1
+					a(href='/') #{nameAndVersion(appName, version)}
+				ul.right
+					- if(typeof currentUser !== 'undefined')
+						li.right
+							a#logout(href='/sessions') Log out
+						li.right
+							form.search(action='/search')
+								input(name='s', value='Search')
 			!{flashMessages}					
 			!= body
 		script(type='text/javascript', src='/javascripts/flash.js')
