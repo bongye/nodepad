@@ -2,30 +2,30 @@
 html
 	head
 		title= 'Nodepad'
-		link(rel='stylesheet', type="text/css", href='/stylesheets/style.css')
-		link(rel='stylesheet', href='/stylesheets/aristo.css')
+		link(rel='stylesheet', type='text/css', href='/bootstrap/css/bootstrap.min.css')
+		link(rel='stylesheet', type='text/css', href='/stylesheets/style.css')
+		link(rel='stylesheet', type='text/css', href='/bootstrap/css/bootstrap-responsive.min.css')
 		script(type='text/javascript', src='/javascripts/json.js')
 		script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
 		script(type='text/javascript', src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js')
 		script(type='text/javascript', src='/javascripts/underscore.min.js')
 		script(type='text/javascript', src='/javascripts/backbone.min.js')
+		script(type='text/javascript', src='/bootstrap/js/bootstrap.js')
 	body
 		#container
-			#header
-				h1
-					a(href='/') #{nameAndVersion(appName, version)}
-				ul.right
-					- if(typeof currentUser !== 'undefined')
-						li.right
-							a#logout(href='/sessions') Log out
-						li.right
-							form.search(action='/search')
-								input(name='s', value='Search')
+			#header.navbar.navbar-fixed-top
+				.navbar-inner
+					.container-fluid
+						.brand #{nameAndVersion(appName, version)}
+						.nav-collapse
+							form.navbar-search.pull-left.search
+								input.search-query.span2(type="text", placeholder="Search")
+							p.navbar-text.pull-right
+								a#logout(href='/sessions') Log Out
 			!{flashMessages}					
 			!= body
 		script(type='text/javascript', src='/javascripts/flash.js')
 		- if(typeof documents !== 'undefined')
 			script(type='text/javascript', src='/javascripts/documents.js')
-			script(type='text/javascript', src='/javascripts/resize.js')
 			script(type='text/javascript')
 				Documents.reset(!{JSON.stringify(documents)});

@@ -1,8 +1,10 @@
-h2 Register
-
-form(method='post', action='/users')
-	!=partial('fields', { locals: { user: user } })
-	div
-		input(type='submit', value='Register')
-		span \ or
-			a(href='/sessions/new') Log In
+.container-fluid
+	.row-fluid
+		.span5#register-form-container
+			form.users.form-horizontal(method='post', action='/users')
+				fieldset
+					legend Register
+						a.btn.pull-right(href='/sessions/new') Log In
+					!=partial('fields', { locals: { user: user } })
+					.form-actions
+						button.btn.btn-primary(type='submit') Register

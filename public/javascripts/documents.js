@@ -56,6 +56,9 @@
 
 	DocumentList = Backbone.View.extend({
 		el: $('#document-list'),
+		events: {
+			'click #show-all': 'showAll'
+		},
 		Collection: Documents,
 		initialize: function(){
 			_.bindAll(this, 'render', 'addDocument', 'showAll', 'create');
@@ -106,7 +109,7 @@
 			Documents.fetch({
 				success: this.openFirst
 			});
-			appView.searcView.reset();
+			appView.searchView.reset();
 		}
 	});
 
@@ -159,7 +162,7 @@
 	});
 
 	ListToolBar = Backbone.View.extend({
-		el: $('#left .toolbar'),
+		el: $('#controls'),
 		events: {
 			'click #create-document': 'add',
 			'click #delete-document': 'remove'
@@ -199,7 +202,7 @@
 	});
 
 	SearchView = Backbone.View.extend({
-		el: $('#header .search'),
+		el: $('form.search'),
 		events: {
 			'submit': 'submit'
 		},
@@ -208,7 +211,7 @@
 		},
 		submit: function(e){
 			e.preventDefault();
-			this.search($('input[name="s"]').val());
+			this.search(this.$el.find('input[name="s"]').val());
 		},
 		reset: function(){
 			this.$el.find("input[name='s']").val('Search');
@@ -216,8 +219,8 @@
 		search: function(value){
 			$.post('/search.json', {
 				s: value
-			}, function(result){
-				appView.documentList.el.html("<li><a id='show-all' href='#'>Show all</a></li>");
+			}, function(results){
+				appView.documentList.$el.html("<li><a id='show-all' href='#'>Show all</a></li>");
 				if(results.length === 0){
 					alert('No results found');
 				} else {

@@ -61,12 +61,12 @@ module.exports = function(app){
 					res.send(documents.map(function(d){
 						return {
 							title: d.title,
-							_id: d._id
+							id: d._id
 						}
 					}));
+				break;
 				default:
 					res.send('Format not available', 406);
-					break;
 				break;
 			}
 		});

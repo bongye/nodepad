@@ -1,10 +1,15 @@
-h2 Log In
-p
-	a(href='/users/new', class='button') Create an account &rarr;
-form.users#login(method='post', action='/sessions')
-	!=partial('../users/fields', { locals: { user: user} })
-	div
-		input(type='submit', value='Log In')
-	div
-		label(for='remember_me') Remember me:
-		input#remember_me(type='checkbox', name='remember_me')
+.container-fluid
+	.row-fluid
+		.span5#login-form-container
+			form.users.form-horizontal#login(method='post', action='/sessions')
+				fieldset
+					legend Log In
+						a.btn.pull-right(href='/users/new') Create an account &rarr;
+					!=partial('../users/fields', { locals: { user: user} })
+					.control-group
+						label(for='remember_me') 
+						.controls
+							label.checkbox Remember me
+								input#remember_me(type='checkbox', name='remember_me')
+					.form-actions
+						button.btn.btn-primary(type='submit') Log In
